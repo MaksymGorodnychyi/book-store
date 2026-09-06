@@ -16,13 +16,13 @@ public class BookSpecificationBuilder {
 
         if (params.titles() != null && params.titles().length > 0) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("title")
+                    .getSpecificationProvider(SpecificationKeys.TITLE)
                     .getSpecification(params.titles()));
         }
 
         if (params.authors() != null && params.authors().length > 0) {
             spec = spec.and(specificationProviderManager
-                    .getSpecificationProvider("author")
+                    .getSpecificationProvider(SpecificationKeys.AUTHOR)
                     .getSpecification(params.authors()));
         }
 
