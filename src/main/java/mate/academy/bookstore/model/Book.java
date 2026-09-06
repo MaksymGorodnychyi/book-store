@@ -40,6 +40,6 @@ public class Book {
     private String description;
     private String coverImage;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT")
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private boolean isDeleted = false;
 }

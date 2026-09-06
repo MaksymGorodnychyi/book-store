@@ -73,7 +73,7 @@ public class BookController {
                     + "with pagination and sorting")
     @GetMapping("/search")
     public Page<BookDto> searchBook(
-            @Valid BookSearchParametersDto bookSearchParametersDto,
+            BookSearchParametersDto bookSearchParametersDto,
             Pageable pageable) {
         return bookService.search(bookSearchParametersDto, pageable);
     }
