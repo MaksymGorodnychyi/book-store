@@ -12,6 +12,7 @@ import mate.academy.bookstore.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
     private final BookService bookService;
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Get all books",
             description = "Get a paginated and sorted list of all books")
     @GetMapping
@@ -36,6 +38,7 @@ public class BookController {
         return bookService.findAll(pageable);
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Get book by id",
             description = "Get a single book by its id")
     @GetMapping("/{id}")
@@ -43,6 +46,7 @@ public class BookController {
         return bookService.findById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a book",
             description = "Create a new book")
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,6 +55,7 @@ public class BookController {
         return bookService.save(bookDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a book",
             description = "Update an existing book by its id")
     @PutMapping("/{id}")
@@ -60,6 +65,7 @@ public class BookController {
         return bookService.update(id, requestDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a book",
             description = "Delete an existing book by its id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -68,6 +74,7 @@ public class BookController {
         bookService.deleteById(id);
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Search books",
             description = "Search for books using the provided parameters "
                     + "with pagination and sorting")
