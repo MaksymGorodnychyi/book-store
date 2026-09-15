@@ -11,6 +11,7 @@ public interface UserMapper {
 
     UserResponseDto toDto(User user);
 
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "roles", ignore = true)
