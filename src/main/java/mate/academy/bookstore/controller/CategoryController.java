@@ -10,6 +10,7 @@ import mate.academy.bookstore.dto.CategoryDto;
 import mate.academy.bookstore.dto.CreateCategoryRequestDto;
 import mate.academy.bookstore.service.BookService;
 import mate.academy.bookstore.service.CategoryService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +36,7 @@ public class CategoryController {
     @Operation(summary = "Get all categories",
             description = "Get a paginated and sorted list of all categories")
     @GetMapping
-    public List<CategoryDto> getAll(Pageable pageable) {
+    public Page<CategoryDto> getAll(Pageable pageable) {
         return categoryService.findAll(pageable);
     }
 
