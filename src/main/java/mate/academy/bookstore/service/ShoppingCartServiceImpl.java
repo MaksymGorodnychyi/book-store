@@ -34,7 +34,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional
     public ShoppingCartDto addBookToCart(Long userId, CreateCartItemRequestDto requestDto) {
-        ShoppingCart shoppingCart = getOrCreate(userId);
+        ShoppingCart shoppingCart = getShoppingCartEntity(userId);
 
         if (!bookRepository.existsById(requestDto.getBookId())) {
             throw new EntityNotFoundException("Book not found with id: " + requestDto.getBookId());
@@ -73,6 +73,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     @Transactional
+    public void createShoppingCart(User user) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        shoppingCartRepository.save(shoppingCart);
+    }
+
+    @Override
+    @Transactional
     public void removeCartItem(Long userId, Long cartItemId) {
         ShoppingCart shoppingCart = getShoppingCartEntity(userId);
 
@@ -89,16 +97,5 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .orElseThrow(() ->
                         new EntityNotFoundException("Cart"
                                 + " not found by userId: " + userId));
-    }
-
-    private ShoppingCart getOrCreate(Long userId) {
-        return shoppingCartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    ShoppingCart shoppingCart = new ShoppingCart();
-                    User user = new User();
-                    user.setId(userId);
-                    shoppingCart.setUser(user);
-                    return shoppingCartRepository.save(shoppingCart);
-                });
     }
 }
