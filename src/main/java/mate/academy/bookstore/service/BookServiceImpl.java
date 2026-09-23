@@ -1,14 +1,21 @@
 package mate.academy.bookstore.service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
 import mate.academy.bookstore.dto.BookSearchParametersDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
 import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
+import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.BookRepository;
+import mate.academy.bookstore.repository.CategoryRepository;
 import mate.academy.bookstore.repository.book.spec.BookSpecificationBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +28,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder bookSpecificationBuilder;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Page<BookDto> findAll(Pageable pageable) {
@@ -31,6 +39,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
+        book.setCategories(getCategoriesByIds(requestDto.getCategoryIds()));
         Book savedBook = bookRepository.save(book);
         return bookMapper.toDto(savedBook);
     }
@@ -61,5 +70,23 @@ public class BookServiceImpl implements BookService {
         Specification<Book> bookSpecification = bookSpecificationBuilder.build(parametersDto);
         return bookRepository.findAll(bookSpecification, pageable)
                 .map(bookMapper::toDto);
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long categoryId) {
+        return bookRepository.findAllByCategoryId(categoryId).stream()
+                .map(bookMapper::toDtoWithoutCategories)
+                .collect(Collectors.toList());
+    }
+
+    private Set<Category> getCategoriesByIds(Set<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return new HashSet<>();
+        }
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.size() != categoryIds.size()) {
+            throw new EntityNotFoundException("Can't find all categories by ids: " + categoryIds);
+        }
+        return new HashSet<>(categories);
     }
 }
