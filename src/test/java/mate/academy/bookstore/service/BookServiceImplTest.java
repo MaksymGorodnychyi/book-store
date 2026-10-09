@@ -2,6 +2,7 @@ package mate.academy.bookstore.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -54,5 +55,12 @@ class BookServiceImplTest {
                 () -> bookService.findById(42L));
 
         assertEquals("Can't find book by id: 42", ex.getMessage());
+    }
+
+    @Test
+    void deleteById_anyId_callsRepositoryOnce() {
+        bookService.deleteById(7L);
+
+        verify(bookRepository).deleteById(7L);
     }
 }
