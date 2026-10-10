@@ -3,6 +3,7 @@ package mate.academy.bookstore.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.BookSearchParametersDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
 import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
@@ -30,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
@@ -164,5 +167,27 @@ class BookServiceImplTest {
                 () -> bookService.save(requestDto));
 
         verify(bookRepository, never()).save(any());
+    }
+
+    @Test
+    void search_validParams_returnsPageOfDtos() {
+        BookSearchParametersDto searchParametersDto = new BookSearchParametersDto(
+                new String[]{"Kobzar"},
+                new String[]{"Shevchenko"});
+        Pageable pageable = PageRequest.of(0, 5);
+        Book book = new Book();
+        BookDto dto = new BookDto();
+        @SuppressWarnings("unchecked")
+        Specification<Book> specification = mock(Specification.class);
+        Page<Book> page = new PageImpl<>(List.of(book));
+
+        when(bookSpecificationBuilder.build(searchParametersDto)).thenReturn(specification);
+        when(bookRepository.findAll(specification, pageable)).thenReturn(page);
+        when(bookMapper.toDto(book)).thenReturn(dto);
+
+        Page<BookDto> actual = bookService.search(searchParametersDto, pageable);
+
+        assertEquals(1, actual.getTotalElements());
+        assertEquals(dto, actual.getContent().get(0));
     }
 }
