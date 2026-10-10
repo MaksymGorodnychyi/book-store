@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
 import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
+import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.repository.CategoryRepository;
 import mate.academy.bookstore.repository.book.spec.BookSpecificationBuilder;
@@ -129,5 +131,38 @@ class BookServiceImplTest {
 
         assertEquals(expected, actual);
         verifyNoInteractions(categoryRepository);
+    }
+
+    @Test
+    void save_allCategoriesFound_returnsDto() {
+        CreateBookRequestDto requestDto = new CreateBookRequestDto();
+        requestDto.setCategoryIds(Set.of(10L, 20L));
+        Book book = new Book();
+        BookDto expected = new BookDto();
+
+        when(bookMapper.toModel(requestDto)).thenReturn(book);
+        when(categoryRepository.findAllById(Set.of(10L, 20L)))
+                .thenReturn(List.of(new Category(), new Category()));
+        when(bookRepository.save(book)).thenReturn(book);
+        when(bookMapper.toDto(book)).thenReturn(expected);
+
+        BookDto actual = bookService.save(requestDto);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void save_someCategoriesMissing_throwsAndNeverSaves() {
+        CreateBookRequestDto requestDto = new CreateBookRequestDto();
+        requestDto.setCategoryIds(Set.of(10L, 20L));
+
+        when(bookMapper.toModel(requestDto)).thenReturn(new Book());
+        when(categoryRepository.findAllById(Set.of(10L, 20L)))
+                .thenReturn(List.of(new Category()));
+
+        assertThrows(EntityNotFoundException.class,
+                () -> bookService.save(requestDto));
+
+        verify(bookRepository, never()).save(any());
     }
 }
