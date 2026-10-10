@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.CreateBookRequestDto;
 import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
@@ -111,5 +113,21 @@ class BookServiceImplTest {
         assertThrows(EntityNotFoundException.class,
                 () -> bookService.update(99L, new UpdateBookRequestDto()));
         verify(bookRepository, never()).save(any());
+    }
+
+    @Test
+    void save_noCategoryIds_returnsDto() {
+        CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
+        Book book = new Book();
+        BookDto expected = new BookDto();
+
+        when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
+        when(bookRepository.save(book)).thenReturn(book);
+        when(bookMapper.toDto(book)).thenReturn(expected);
+
+        BookDto actual = bookService.save(createBookRequestDto);
+
+        assertEquals(expected, actual);
+        verifyNoInteractions(categoryRepository);
     }
 }
