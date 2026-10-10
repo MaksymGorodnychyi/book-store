@@ -2,12 +2,15 @@ package mate.academy.bookstore.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
@@ -83,5 +86,30 @@ class BookServiceImplTest {
 
         assertEquals(1, bookDtoPage.getTotalElements());
         assertEquals(dto, bookDtoPage.getContent().get(0));
+    }
+
+    @Test
+    void update_existingId_returnsUpdatedDto() {
+        Book book = new Book();
+        BookDto expected = new BookDto();
+        UpdateBookRequestDto requestDto = new UpdateBookRequestDto();
+
+        when(bookRepository.findById(3L)).thenReturn(Optional.of(book));
+        when(bookRepository.save(book)).thenReturn(book);
+        when(bookMapper.toDto(book)).thenReturn(expected);
+
+        BookDto actual = bookService.update(3L, requestDto);
+
+        assertEquals(expected, actual);
+        verify(bookMapper).updateEntityFromDto(book, requestDto);
+    }
+
+    @Test
+    void update_missingId_neverSaves() {
+        when(bookRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> bookService.update(99L, new UpdateBookRequestDto()));
+        verify(bookRepository, never()).save(any());
     }
 }
