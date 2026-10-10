@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
 import mate.academy.bookstore.dto.BookSearchParametersDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
 import mate.academy.bookstore.dto.UpdateBookRequestDto;
@@ -189,5 +190,18 @@ class BookServiceImplTest {
 
         assertEquals(1, actual.getTotalElements());
         assertEquals(dto, actual.getContent().get(0));
+    }
+
+    @Test
+    void findAllByCategoryId_existingCategory_returnsDtoList() {
+        Book book = new Book();
+        BookDtoWithoutCategoryIds dtoWithoutCategoryIds = new BookDtoWithoutCategoryIds();
+
+        when(bookRepository.findAllByCategoryId(5L)).thenReturn(List.of(book));
+        when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dtoWithoutCategoryIds);
+
+        List<BookDtoWithoutCategoryIds> actual = bookService.findAllByCategoryId(5L);
+
+        assertEquals(List.of(dtoWithoutCategoryIds), actual);
     }
 }
