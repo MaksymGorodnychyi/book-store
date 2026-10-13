@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import mate.academy.bookstore.dto.CategoryDto;
+import mate.academy.bookstore.dto.CreateCategoryRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.CategoryMapper;
 import mate.academy.bookstore.model.Category;
@@ -15,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
@@ -46,5 +52,36 @@ class CategoryServiceImplTest {
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
                 () -> categoryService.getById(7L));
         assertEquals("Can't find category by id: 7", ex.getMessage());
+    }
+
+    @Test
+    void findAll_withPageable_returnsPageOfDtos() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Category category = new Category();
+        CategoryDto dto = new CategoryDto();
+        Page<Category> categoryPage = new PageImpl<>(List.of(category));
+
+        when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
+        when(categoryMapper.toDto(category)).thenReturn(dto);
+
+        Page<CategoryDto> categoryDtoPage = categoryService.findAll(pageable);
+
+        assertEquals(1, categoryDtoPage.getTotalElements());
+        assertEquals(dto, categoryDtoPage.getContent().get(0));
+    }
+
+    @Test
+    void save_validRequest_returnsDto() {
+        CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
+        Category category = new Category();
+        CategoryDto expected = new CategoryDto();
+
+        when(categoryMapper.toModel(categoryRequestDto)).thenReturn(category);
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toDto(category)).thenReturn(expected);
+
+        CategoryDto actual = categoryService.save(categoryRequestDto);
+
+        assertEquals(expected, actual);
     }
 }
