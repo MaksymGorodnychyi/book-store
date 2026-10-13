@@ -2,6 +2,9 @@ package mate.academy.bookstore.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -83,5 +86,37 @@ class CategoryServiceImplTest {
         CategoryDto actual = categoryService.save(categoryRequestDto);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void update_existingId_returnsUpdatedDto() {
+        Category category = new Category();
+        CategoryDto expected = new CategoryDto();
+        CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
+
+        when(categoryRepository.findById(3L)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toDto(category)).thenReturn(expected);
+
+        CategoryDto actual = categoryService.update(3L, requestDto);
+
+        assertEquals(expected, actual);
+        verify(categoryMapper).updateEntityFromDto(category, requestDto);
+    }
+
+    @Test
+    void deleteById_anyId_callsRepositoryOnce() {
+        categoryService.deleteById(6L);
+
+        verify(categoryRepository).deleteById(6L);
+    }
+
+    @Test
+    void update_missingId_throwsAndNeverSaves() {
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> categoryService.update(99L, new CreateCategoryRequestDto()));
+        verify(categoryRepository, never()).save(any());
     }
 }
