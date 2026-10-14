@@ -25,11 +25,11 @@ class BookRepositoryTest {
         Category savedCategory = categoryRepository.save(category);
 
         Book book = new Book();
+        book.getCategories().add(savedCategory);
         book.setTitle("KetoDiet");
         book.setIsbn("9781234567897");
         book.setAuthor("Test Author");
         book.setPrice(BigDecimal.valueOf(100));
-        book.getCategories().add(savedCategory);
         bookRepository.saveAndFlush(book);
 
         List<Book> bookList = bookRepository.findAllByCategoryId(savedCategory.getId());
@@ -40,13 +40,9 @@ class BookRepositoryTest {
 
     @Test
     void findAllByCategoryId_otherCategory_returnsEmptyList() {
-        Category category = new Category();
-        category.setName("Keto");
-        Category savedCategory = categoryRepository.save(category);
-
-        Category category1 = new Category();
-        category1.setName("Mediterranean");
-        Category savedCategory1 = categoryRepository.save(category1);
+        Category keto = new Category();
+        keto.setName("Keto");
+        Category savedCategory = categoryRepository.save(keto);
 
         Book book = new Book();
         book.setTitle("Diets");
@@ -56,7 +52,11 @@ class BookRepositoryTest {
         book.setPrice(BigDecimal.valueOf(100));
         bookRepository.saveAndFlush(book);
 
-        List<Book> actual = bookRepository.findAllByCategoryId(savedCategory1.getId());
+        Category mediterranean = new Category();
+        mediterranean.setName("Mediterranean");
+        Category savedMediterranean = categoryRepository.save(mediterranean);
+
+        List<Book> actual = bookRepository.findAllByCategoryId(savedMediterranean.getId());
 
         assertTrue(actual.isEmpty());
     }
