@@ -1,10 +1,12 @@
 package mate.academy.bookstore.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,6 +88,36 @@ class CategoryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequestDto)))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Keto"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getCategoryById_authenticatedUser_returnsOk() throws Exception {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(1L);
+        dto.setName("Keto");
+        when(categoryService.getById(1L)).thenReturn(dto);
+
+        mockMvc.perform(get("/categories/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Keto"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateCategory_adminRole_returnsOk() throws Exception {
+        CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
+        categoryRequestDto.setName("Keto");
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName("Keto");
+        when(categoryService.update(eq(1L), any(CreateCategoryRequestDto.class)))
+                .thenReturn(categoryDto);
+
+        mockMvc.perform(put("/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryRequestDto)))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Keto"));
     }
 }
