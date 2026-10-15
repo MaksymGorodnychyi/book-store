@@ -34,12 +34,14 @@ public final class TestUtil {
         category.setName(name);
         return category;
     }
+
     public static BookDtoWithoutCategoryIds createBookDtoWithoutCategoryIds(Book book) {
         BookDtoWithoutCategoryIds dto = new BookDtoWithoutCategoryIds();
         dto.setId(book.getId());
         dto.setTitle(book.getTitle());
         return dto;
     }
+
     public static CategoryDto createCategoryDto(Category category) {
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());

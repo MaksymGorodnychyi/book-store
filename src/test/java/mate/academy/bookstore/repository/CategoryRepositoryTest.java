@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import mate.academy.bookstore.model.Category;
+import mate.academy.bookstore.util.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -16,9 +17,7 @@ class CategoryRepositoryTest {
 
     @Test
     void findById_savedCategory_returnsCategory() {
-        Category category = new Category();
-        category.setName("Keto");
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(TestUtil.createCategory(null, "Keto"));
 
         Optional<Category> optionalCategory = categoryRepository.findById(savedCategory.getId());
 
