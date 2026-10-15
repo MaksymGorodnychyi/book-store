@@ -51,7 +51,7 @@ class BookServiceImplTest {
     private BookServiceImpl bookService;
 
     @Test
-    void findById_existingId_returnsDto() {
+    void findById_ExistingId_ShouldReturnBookDto() {
         Book book = TestUtil.createBook(1L, "KetoDiet");
         BookDto expected = TestUtil.createBookDto(book);
 
@@ -63,7 +63,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void findById_missingId_throwsException() {
+    void findById_NonExistingId_ShouldThrowException() {
         when(bookRepository.findById(42L)).thenReturn(Optional.empty());
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
                 () -> bookService.findById(42L));
@@ -72,14 +72,14 @@ class BookServiceImplTest {
     }
 
     @Test
-    void deleteById_anyId_callsRepositoryOnce() {
+    void deleteById_ValidId_ShouldCallRepositoryOnce() {
         bookService.deleteById(7L);
 
         verify(bookRepository).deleteById(7L);
     }
 
     @Test
-    void findAll_withPageable_returnsPageOfDtos() {
+    void findAll_ValidPageable_ShouldReturnPageOfBookDtos() {
         Pageable pageable = PageRequest.of(0, 10);
         Book book = TestUtil.createBook(1L, "KetoDiet");
         BookDto dto = TestUtil.createBookDto(book);
@@ -95,7 +95,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void update_existingId_returnsUpdatedDto() {
+    void update_ExistingId_ShouldReturnUpdatedBookDto() {
         Book book = TestUtil.createBook(1L, "KetoDiet");
         BookDto expected = TestUtil.createBookDto(book);
         UpdateBookRequestDto requestDto = new UpdateBookRequestDto();
@@ -111,7 +111,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void update_missingId_neverSaves() {
+    void update_NonExistingId_ShouldThrowAndNeverSave() {
         when(bookRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
@@ -120,7 +120,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void save_noCategoryIds_returnsDto() {
+    void save_NoCategoryIds_ShouldSaveBookWithoutCategories() {
         CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
         Book book = TestUtil.createBook(1L, "KetoDiet");
         BookDto expected = TestUtil.createBookDto(book);
@@ -136,7 +136,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void save_allCategoriesFound_returnsDto() {
+    void save_AllCategoriesExist_ShouldReturnBookDto() {
         CreateBookRequestDto requestDto = new CreateBookRequestDto();
         requestDto.setCategoryIds(Set.of(10L, 20L));
         Book book = TestUtil.createBook(1L, "KetoDiet");
@@ -155,7 +155,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void save_someCategoriesMissing_throwsAndNeverSaves() {
+    void save_SomeCategoriesMissing_ShouldThrowAndNeverSave() {
         CreateBookRequestDto requestDto = new CreateBookRequestDto();
         requestDto.setCategoryIds(Set.of(10L, 20L));
 
@@ -170,7 +170,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void search_validParams_returnsPageOfDtos() {
+    void search_ValidParameters_ShouldReturnPageOfBookDtos() {
         BookSearchParametersDto searchParametersDto = new BookSearchParametersDto(
                 new String[]{"Keto"},
                 new String[]{"KetoDiet"});
@@ -192,7 +192,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void findAllByCategoryId_existingCategory_returnsDtoList() {
+    void findAllByCategoryId_ExistingCategory_ShouldReturnBookDtoList() {
         Book book = TestUtil.createBook(1L, "KetoDiet");
         BookDtoWithoutCategoryIds dtoWithoutCategoryIds =
                 TestUtil.createBookDtoWithoutCategoryIds(book);

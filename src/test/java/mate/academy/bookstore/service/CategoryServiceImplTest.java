@@ -37,7 +37,7 @@ class CategoryServiceImplTest {
     private CategoryServiceImpl categoryService;
 
     @Test
-    void getById_existingId_returnsDto() {
+    void getById_ExistingId_ShouldReturnCategoryDto() {
         Category category = TestUtil.createCategory(4L, "Keto");
         CategoryDto expected = TestUtil.createCategoryDto(category);
 
@@ -50,7 +50,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void getById_missingId_throwsException() {
+    void getById_NonExistingId_ShouldThrowException() {
         when(categoryRepository.findById(7L)).thenReturn(Optional.empty());
 
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
@@ -59,7 +59,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void findAll_withPageable_returnsPageOfDtos() {
+    void findAll_ValidPageable_ShouldReturnPageOfCategoryDtos() {
         Pageable pageable = PageRequest.of(0, 10);
         Category category = TestUtil.createCategory(4L, "Keto");
         CategoryDto dto = TestUtil.createCategoryDto(category);
@@ -75,7 +75,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void save_validRequest_returnsDto() {
+    void save_ValidRequest_ShouldReturnCategoryDto() {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
         Category category = TestUtil.createCategory(4L, "Keto");
         CategoryDto expected = TestUtil.createCategoryDto(category);
@@ -90,7 +90,7 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void update_existingId_returnsUpdatedDto() {
+    void update_ExistingId_ShouldReturnUpdatedCategoryDto() {
         Category category = TestUtil.createCategory(4L, "Keto");
         CategoryDto expected = TestUtil.createCategoryDto(category);
         CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
@@ -106,14 +106,14 @@ class CategoryServiceImplTest {
     }
 
     @Test
-    void deleteById_anyId_callsRepositoryOnce() {
+    void deleteById_ValidId_ShouldCallRepositoryOnce() {
         categoryService.deleteById(6L);
 
         verify(categoryRepository).deleteById(6L);
     }
 
     @Test
-    void update_missingId_throwsAndNeverSaves() {
+    void update_NonExistingId_ShouldThrowAndNeverSave() {
         when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,

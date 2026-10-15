@@ -40,7 +40,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void getAll_authenticatedUser_returnsOk() throws Exception {
+    void getAll_CategoriesInDb_ShouldReturnPageOfCategories() throws Exception {
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Keto"));
@@ -48,7 +48,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void deleteCategory_userRole_returnsForbidden() throws Exception {
+    void deleteCategory_UserRole_ShouldReturnForbidden() throws Exception {
         mockMvc.perform(delete("/categories/1"))
                 .andExpect(status().isForbidden());
     }
@@ -59,7 +59,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void getBooksByCategoryId_authenticatedUser_returnsOk() throws Exception {
+    void getBooksByCategoryId_BooksInCategory_ShouldReturnBookList() throws Exception {
         mockMvc.perform(get("/categories/1/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("KetoDiet"));
@@ -69,7 +69,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
     @WithMockUser(roles = "ADMIN")
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void createCategory_adminRole_returnsCreated() throws Exception {
+    void createCategory_ValidRequest_ShouldCreateNewCategory() throws Exception {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
         categoryRequestDto.setName("Keto");
         mockMvc.perform(post("/categories")
@@ -85,7 +85,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void getCategoryById_authenticatedUser_returnsOk() throws Exception {
+    void getCategoryById_ExistingCategory_ShouldReturnCategoryDto() throws Exception {
         mockMvc.perform(get("/categories/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Keto"));
@@ -97,7 +97,7 @@ class CategoryControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void updateCategory_adminRole_returnsOk() throws Exception {
+    void updateCategory_ExistingCategory_ShouldReturnUpdatedCategory() throws Exception {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
         categoryRequestDto.setName("Keto Updated");
         mockMvc.perform(put("/categories/1")

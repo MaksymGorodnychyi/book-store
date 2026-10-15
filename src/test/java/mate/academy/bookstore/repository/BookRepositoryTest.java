@@ -19,7 +19,7 @@ class BookRepositoryTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    void findAllByCategoryId_existingCategory_returnsBooks() {
+    void findAllByCategoryId_ExistingCategory_ShouldReturnBooks() {
         Category savedCategory = categoryRepository.save(TestUtil.createCategory(null, "Keto"));
 
         Book book = TestUtil.createBook(null, "KetoDiet");
@@ -32,7 +32,7 @@ class BookRepositoryTest {
     }
 
     @Test
-    void findAllByCategoryId_otherCategory_returnsEmptyList() {
+    void findAllByCategoryId_OtherCategory_ShouldReturnEmptyList() {
         Category savedKeto = categoryRepository.save(TestUtil.createCategory(null, "Keto"));
 
         Book book = TestUtil.createBook(null, "Diet");

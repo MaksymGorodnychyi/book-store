@@ -41,7 +41,7 @@ class BookControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void getBookById_authenticatedUser_returnsOk() throws Exception {
+    void getBookById_ExistingBook_ShouldReturnBookDto() throws Exception {
         mockMvc.perform(get("/books/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("KetoDiet"));
@@ -49,14 +49,14 @@ class BookControllerTest extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void delete_userRole_returnsForbidden() throws Exception {
+    void deleteBook_UserRole_ShouldReturnForbidden() throws Exception {
         mockMvc.perform(delete("/books/1"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void delete_adminRole_returnsNoContent() throws Exception {
+    void deleteBook_AdminRole_ShouldReturnNoContent() throws Exception {
         mockMvc.perform(delete("/books/1"))
                 .andExpect(status().isNoContent());
     }
@@ -67,7 +67,7 @@ class BookControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-books.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void getAll_authenticatedUser_returnsOk() throws Exception {
+    void getAll_BooksInDb_ShouldReturnPageOfBooks() throws Exception {
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].title").value("KetoDiet"));
@@ -79,7 +79,7 @@ class BookControllerTest extends AbstractIntegrationTest {
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/remove-category.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void createBook_adminRole_returnsCreated() throws Exception {
+    void createBook_ValidRequest_ShouldCreateNewBook() throws Exception {
         CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
         createBookRequestDto.setTitle("KetoDiet");
         createBookRequestDto.setPrice(BigDecimal.valueOf(100));

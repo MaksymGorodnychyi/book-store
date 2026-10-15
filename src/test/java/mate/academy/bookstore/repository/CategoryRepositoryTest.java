@@ -16,7 +16,7 @@ class CategoryRepositoryTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    void findById_savedCategory_returnsCategory() {
+    void findById_SavedCategory_ShouldReturnCategory() {
         Category savedCategory = categoryRepository.save(TestUtil.createCategory(null, "Keto"));
 
         Optional<Category> optionalCategory = categoryRepository.findById(savedCategory.getId());
