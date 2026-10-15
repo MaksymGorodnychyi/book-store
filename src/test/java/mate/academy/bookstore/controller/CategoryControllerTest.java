@@ -1,8 +1,6 @@
 package mate.academy.bookstore.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,46 +9,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
-import mate.academy.bookstore.dto.CategoryDto;
+import mate.academy.bookstore.AbstractIntegrationTest;
 import mate.academy.bookstore.dto.CreateCategoryRequestDto;
-import mate.academy.bookstore.service.BookService;
-import mate.academy.bookstore.service.CategoryService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class CategoryControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+class CategoryControllerTest extends AbstractIntegrationTest {
+    protected static MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockitoBean
-    private CategoryService categoryService;
-    @MockitoBean
-    private BookService bookService;
+
+    @BeforeAll
+    static void beforeAll(@Autowired WebApplicationContext webApplicationContext) {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
     @WithMockUser(roles = "USER")
+    @Sql(scripts = "classpath:database/books/add-category.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getAll_authenticatedUser_returnsOk() throws Exception {
-        CategoryDto dto = new CategoryDto();
-        dto.setId(1L);
-        dto.setName("Keto");
-        Page<CategoryDto> page = new PageImpl<>(List.of(dto));
-
-        when(categoryService.findAll(any(Pageable.class))).thenReturn(page);
-
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Keto"));
@@ -65,11 +55,11 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    @Sql(scripts = "classpath:database/books/add-books.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getBooksByCategoryId_authenticatedUser_returnsOk() throws Exception {
-        BookDtoWithoutCategoryIds ids = new BookDtoWithoutCategoryIds();
-        ids.setTitle("KetoDiet");
-        when(bookService.findAllByCategoryId(1L)).thenReturn(List.of(ids));
-
         mockMvc.perform(get("/categories/1/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("KetoDiet"));
@@ -77,13 +67,11 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    @Sql(scripts = "classpath:database/books/remove-books.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void createCategory_adminRole_returnsCreated() throws Exception {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
-        CategoryDto categoryDto = new CategoryDto();
         categoryRequestDto.setName("Keto");
-        categoryDto.setName("Keto");
-        when(categoryService.save(any(CreateCategoryRequestDto.class))).thenReturn(categoryDto);
-
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequestDto)))
@@ -93,12 +81,11 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
+    @Sql(scripts = "classpath:database/books/add-category.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getCategoryById_authenticatedUser_returnsOk() throws Exception {
-        CategoryDto dto = new CategoryDto();
-        dto.setId(1L);
-        dto.setName("Keto");
-        when(categoryService.getById(1L)).thenReturn(dto);
-
         mockMvc.perform(get("/categories/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Keto"));
@@ -106,18 +93,17 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    @Sql(scripts = "classpath:database/books/add-category.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void updateCategory_adminRole_returnsOk() throws Exception {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
-        categoryRequestDto.setName("Keto");
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setName("Keto");
-        when(categoryService.update(eq(1L), any(CreateCategoryRequestDto.class)))
-                .thenReturn(categoryDto);
-
+        categoryRequestDto.setName("Keto Updated");
         mockMvc.perform(put("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Keto"));
+                .andExpect(jsonPath("$.name").value("Keto Updated"));
     }
 }
