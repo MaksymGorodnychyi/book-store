@@ -15,6 +15,7 @@ import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.CategoryMapper;
 import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.CategoryRepository;
+import mate.academy.bookstore.util.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,8 +38,8 @@ class CategoryServiceImplTest {
 
     @Test
     void getById_existingId_returnsDto() {
-        Category category = new Category();
-        CategoryDto expected = new CategoryDto();
+        Category category = TestUtil.createCategory(4L, "Keto");
+        CategoryDto expected = TestUtil.createCategoryDto(category);
 
         when(categoryRepository.findById(4L)).thenReturn(Optional.of(category));
         when(categoryMapper.toDto(category)).thenReturn(expected);
@@ -60,8 +61,8 @@ class CategoryServiceImplTest {
     @Test
     void findAll_withPageable_returnsPageOfDtos() {
         Pageable pageable = PageRequest.of(0, 10);
-        Category category = new Category();
-        CategoryDto dto = new CategoryDto();
+        Category category = TestUtil.createCategory(4L, "Keto");
+        CategoryDto dto = TestUtil.createCategoryDto(category);
         Page<Category> categoryPage = new PageImpl<>(List.of(category));
 
         when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
@@ -76,8 +77,8 @@ class CategoryServiceImplTest {
     @Test
     void save_validRequest_returnsDto() {
         CreateCategoryRequestDto categoryRequestDto = new CreateCategoryRequestDto();
-        Category category = new Category();
-        CategoryDto expected = new CategoryDto();
+        Category category = TestUtil.createCategory(4L, "Keto");
+        CategoryDto expected = TestUtil.createCategoryDto(category);
 
         when(categoryMapper.toModel(categoryRequestDto)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
@@ -90,8 +91,8 @@ class CategoryServiceImplTest {
 
     @Test
     void update_existingId_returnsUpdatedDto() {
-        Category category = new Category();
-        CategoryDto expected = new CategoryDto();
+        Category category = TestUtil.createCategory(4L, "Keto");
+        CategoryDto expected = TestUtil.createCategoryDto(category);
         CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
 
         when(categoryRepository.findById(3L)).thenReturn(Optional.of(category));

@@ -3,6 +3,7 @@ package mate.academy.bookstore.util;
 import java.math.BigDecimal;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
+import mate.academy.bookstore.dto.CategoryDto;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.model.Category;
 
@@ -37,6 +38,12 @@ public final class TestUtil {
         BookDtoWithoutCategoryIds dto = new BookDtoWithoutCategoryIds();
         dto.setId(book.getId());
         dto.setTitle(book.getTitle());
+        return dto;
+    }
+    public static CategoryDto createCategoryDto(Category category) {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
         return dto;
     }
 }
