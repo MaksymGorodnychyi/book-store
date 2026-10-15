@@ -20,10 +20,10 @@ import mate.academy.bookstore.dto.UpdateBookRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
-import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.repository.CategoryRepository;
 import mate.academy.bookstore.repository.book.spec.BookSpecificationBuilder;
+import mate.academy.bookstore.util.TestUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,10 +52,8 @@ class BookServiceImplTest {
 
     @Test
     void findById_existingId_returnsDto() {
-        Book book = new Book();
-        book.setId(1L);
-        BookDto expected = new BookDto();
-        expected.setId(1L);
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto expected = TestUtil.createBookDto(book);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(bookMapper.toDto(book)).thenReturn(expected);
@@ -83,8 +81,8 @@ class BookServiceImplTest {
     @Test
     void findAll_withPageable_returnsPageOfDtos() {
         Pageable pageable = PageRequest.of(0, 10);
-        Book book = new Book();
-        BookDto dto = new BookDto();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto dto = TestUtil.createBookDto(book);
         Page<Book> bookPage = new PageImpl<>(List.of(book));
 
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
@@ -98,8 +96,8 @@ class BookServiceImplTest {
 
     @Test
     void update_existingId_returnsUpdatedDto() {
-        Book book = new Book();
-        BookDto expected = new BookDto();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto expected = TestUtil.createBookDto(book);
         UpdateBookRequestDto requestDto = new UpdateBookRequestDto();
 
         when(bookRepository.findById(3L)).thenReturn(Optional.of(book));
@@ -124,8 +122,8 @@ class BookServiceImplTest {
     @Test
     void save_noCategoryIds_returnsDto() {
         CreateBookRequestDto createBookRequestDto = new CreateBookRequestDto();
-        Book book = new Book();
-        BookDto expected = new BookDto();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto expected = TestUtil.createBookDto(book);
 
         when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
         when(bookRepository.save(book)).thenReturn(book);
@@ -141,12 +139,13 @@ class BookServiceImplTest {
     void save_allCategoriesFound_returnsDto() {
         CreateBookRequestDto requestDto = new CreateBookRequestDto();
         requestDto.setCategoryIds(Set.of(10L, 20L));
-        Book book = new Book();
-        BookDto expected = new BookDto();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto expected = TestUtil.createBookDto(book);
 
         when(bookMapper.toModel(requestDto)).thenReturn(book);
         when(categoryRepository.findAllById(Set.of(10L, 20L)))
-                .thenReturn(List.of(new Category(), new Category()));
+                .thenReturn(List.of(TestUtil.createCategory(10L, "Keto"),
+                        TestUtil.createCategory(20L, "Sport")));
         when(bookRepository.save(book)).thenReturn(book);
         when(bookMapper.toDto(book)).thenReturn(expected);
 
@@ -160,9 +159,9 @@ class BookServiceImplTest {
         CreateBookRequestDto requestDto = new CreateBookRequestDto();
         requestDto.setCategoryIds(Set.of(10L, 20L));
 
-        when(bookMapper.toModel(requestDto)).thenReturn(new Book());
+        when(bookMapper.toModel(requestDto)).thenReturn(TestUtil.createBook(1L, "KetoDiet"));
         when(categoryRepository.findAllById(Set.of(10L, 20L)))
-                .thenReturn(List.of(new Category()));
+                .thenReturn(List.of(TestUtil.createCategory(10L, "Keto")));
 
         assertThrows(EntityNotFoundException.class,
                 () -> bookService.save(requestDto));
@@ -173,11 +172,11 @@ class BookServiceImplTest {
     @Test
     void search_validParams_returnsPageOfDtos() {
         BookSearchParametersDto searchParametersDto = new BookSearchParametersDto(
-                new String[]{"Kobzar"},
-                new String[]{"Shevchenko"});
+                new String[]{"Keto"},
+                new String[]{"KetoDiet"});
         Pageable pageable = PageRequest.of(0, 5);
-        Book book = new Book();
-        BookDto dto = new BookDto();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDto dto = TestUtil.createBookDto(book);
         @SuppressWarnings("unchecked")
         Specification<Book> specification = mock(Specification.class);
         Page<Book> page = new PageImpl<>(List.of(book));
@@ -194,8 +193,9 @@ class BookServiceImplTest {
 
     @Test
     void findAllByCategoryId_existingCategory_returnsDtoList() {
-        Book book = new Book();
-        BookDtoWithoutCategoryIds dtoWithoutCategoryIds = new BookDtoWithoutCategoryIds();
+        Book book = TestUtil.createBook(1L, "KetoDiet");
+        BookDtoWithoutCategoryIds dtoWithoutCategoryIds =
+                TestUtil.createBookDtoWithoutCategoryIds(book);
 
         when(bookRepository.findAllByCategoryId(5L)).thenReturn(List.of(book));
         when(bookMapper.toDtoWithoutCategories(book)).thenReturn(dtoWithoutCategoryIds);
