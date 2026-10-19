@@ -176,6 +176,18 @@ mvn clean verify
 Tests use an in-memory H2 database, so Docker is not required.
 This command also runs Checkstyle.
 
+## Postman Collection
+
+A ready-to-use collection is available in
+[`postman/book-store.postman_collection.json`](postman/book-store.postman_collection.json).
+
+1. Import the file into Postman
+2. Check the `baseUrl` collection variable (default: `http://localhost:8088/api`)
+3. Run **Login**: the JWT token is saved to the `token` variable automatically
+4. Other requests use this token, so you can call them right away
+5. **Create book** links the book to category `1`, so create a category first
+   (`POST /api/categories`, e.g. via Swagger UI)
+
 ## Challenges
 
 **Role prefixes in Spring Security.**
