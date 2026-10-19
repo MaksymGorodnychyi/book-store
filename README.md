@@ -1,5 +1,12 @@
-# book-store
-Online book store REST API built with Spring Boot
+# 📚 Book Store API
+
+A backend for an online bookstore: customers browse and search the catalog, fill a
+shopping cart and place orders, while administrators manage books, categories and
+order statuses. The API is secured with JWT and role-based access, documented with
+Swagger and fully containerized with Docker, so it can be started with one command.
+
+I built this project during the Mate Academy Java course to practice building a
+production-style REST API with Spring Boot, from database migrations to security.
 
 ## Tech Stack
 
