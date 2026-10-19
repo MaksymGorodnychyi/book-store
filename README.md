@@ -175,3 +175,24 @@ mvn clean verify
 
 Tests use an in-memory H2 database, so Docker is not required.
 This command also runs Checkstyle.
+
+## Challenges
+
+**Role prefixes in Spring Security.**
+`hasRole('ADMIN')` silently checks for the authority `ROLE_ADMIN`, so mixing prefixed
+and unprefixed role names led to unexpected 403 errors. I stored roles in an enum that
+already contains the `ROLE_` prefix and kept `@PreAuthorize` expressions without it.
+
+**Creating the admin user without hardcoded ids.**
+The admin must be linked to the `ROLE_ADMIN` role, but ids differ between databases.
+In the Liquibase changeset I used `valueComputed` with subqueries that look up the user
+and the role by their unique names, so the migration works on any fresh database.
+
+**The application started before the database was ready.**
+On the first Docker start the app container tried to connect while MySQL was still
+initializing. I added a healthcheck to the database service and made the app start
+only when the database reports it is healthy.
+
+**Port conflict with a local MySQL.**
+Port 3306 was already taken by MySQL installed on my machine. I moved all ports into
+`.env`, so the host port can be changed (e.g. to 3307) without touching the code.
