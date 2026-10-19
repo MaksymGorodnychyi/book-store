@@ -10,19 +10,19 @@ production-style REST API with Spring Boot, from database migrations to security
 
 ## Tech Stack
 
-| Category      | Technologies                           |
-|---------------|----------------------------------------|
-| Language      | Java 17                                |
-| Framework     | Spring Boot 3.5, Spring Web            |
-| Security      | Spring Security, JWT (jjwt)            |
-| Persistence   | Spring Data JPA, Hibernate, MySQL 8.4  |
-| Migrations    | Liquibase                              |
-| Mapping       | MapStruct, Lombok                      |
-| Validation    | Jakarta Bean Validation                |
-| API docs      | Swagger UI (springdoc-openapi)         |
-| Testing       | JUnit 5, Mockito, Spring Boot Test, H2 |
-| Build & tools | Maven, Checkstyle                      |
-| DevOps        | Docker, Docker Compose                 |
+| Category      | Technologies                                |
+|---------------|---------------------------------------------|
+| Language      | Java 17                                     |
+| Framework     | Spring Boot 3.5, Spring Web                 |
+| Security      | Spring Security, JWT (jjwt)                 |
+| Persistence   | Spring Data JPA, Hibernate, MySQL 8.4       |
+| Migrations    | Liquibase                                   |
+| Mapping       | MapStruct, Lombok                           |
+| Validation    | Jakarta Bean Validation                     |
+| API docs      | Swagger UI (springdoc-openapi)              |
+| Testing       | JUnit 5, Mockito, Spring Boot Test, H2      |
+| Build & tools | Maven, Checkstyle                           |
+| DevOps        | Docker, Docker Compose, GitHub Actions (CI) |
 
 ## API Endpoints
 
