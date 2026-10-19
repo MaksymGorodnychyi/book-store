@@ -82,6 +82,20 @@ so no user id is passed in the URL and nobody can access someone else's cart.
 An order is built from the user's current shopping cart: every cart item becomes an
 order item. Users see only their own orders, while the admin manages order statuses.
 
+## Database Schema
+
+```mermaid
+erDiagram
+    USER }o--o{ ROLE : has
+    USER ||--|| SHOPPING_CART : owns
+    USER ||--o{ ORDER : places
+    SHOPPING_CART ||--o{ CART_ITEM : contains
+    ORDER ||--|{ ORDER_ITEM : contains
+    BOOK ||--o{ CART_ITEM : "added as"
+    BOOK ||--o{ ORDER_ITEM : "ordered as"
+    BOOK }o--o{ CATEGORY : "belongs to"
+```
+
 ## Running with Docker
 
 ### Prerequisites
