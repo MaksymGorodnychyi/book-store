@@ -1,6 +1,70 @@
 # book-store
 Online book store REST API built with Spring Boot
 
+## API Endpoints
+
+### 🔐 Authentication
+| Method | Endpoint                 | Description       | Access |
+|--------|--------------------------|-------------------|--------|
+| POST   | `/api/auth/registration` | Register new user | Public |
+| POST   | `/api/auth/login`        | User login        | Public |
+
+Login returns a JWT token. Send it in the `Authorization: Bearer <token>` header
+to access all other endpoints.
+
+### 📚 Books
+| Method | Endpoint             | Description                               | Access      |
+|--------|----------------------|-------------------------------------------|-------------|
+| GET    | `/api/books`         | Get all books (paginated and sorted)      | USER, ADMIN |
+| GET    | `/api/books/{id}`    | Get book by id                            | USER, ADMIN |
+| GET    | `/api/books/search`  | Search books by parameters (paginated)    | USER, ADMIN |
+| POST   | `/api/books`         | Create a book                             | ADMIN       |
+| PUT    | `/api/books/{id}`    | Update a book                             | ADMIN       |
+| DELETE | `/api/books/{id}`    | Delete a book (soft delete)               | ADMIN       |
+
+Pagination and sorting work through query parameters, for example
+`/api/books?page=0&size=10&sort=price,desc`.
+Search combines filters dynamically using JPA Specifications, for example
+`/api/books/search?titles=Java&authors=Bloch`.
+
+### 🏷️ Categories
+| Method | Endpoint                     | Description                               | Access      |
+|--------|------------------------------|-------------------------------------------|-------------|
+| GET    | `/api/categories`            | Get all categories (paginated and sorted) | USER, ADMIN |
+| GET    | `/api/categories/{id}`       | Get category by id                        | USER, ADMIN |
+| GET    | `/api/categories/{id}/books` | Get all books in a category               | USER, ADMIN |
+| POST   | `/api/categories`            | Create a category                         | ADMIN       |
+| PUT    | `/api/categories/{id}`       | Update a category                         | ADMIN       |
+| DELETE | `/api/categories/{id}`       | Delete a category                         | ADMIN       |
+
+Books and categories are linked many-to-many: one book can belong to several categories.
+When books are listed inside a category, the response uses a lighter DTO without
+category ids, since the category is already known from the request.
+
+### 🛒 Shopping Cart
+| Method | Endpoint                             | Description                     | Access |
+|--------|--------------------------------------|---------------------------------|--------|
+| GET    | `/api/cart`                          | Get the current user's cart     | USER   |
+| POST   | `/api/cart`                          | Add a book to the cart          | USER   |
+| PUT    | `/api/cart/cart-items/{cartItemId}`  | Update the quantity of an item  | USER   |
+| DELETE | `/api/cart/cart-items/{cartItemId}`  | Remove an item from the cart    | USER   |
+
+The cart always belongs to the logged-in user: the user is taken from the JWT token,
+so no user id is passed in the URL and nobody can access someone else's cart.
+> The admin account has no cart. To test the cart and orders, register a regular user.
+
+### 📦 Orders
+| Method | Endpoint                                | Description                          | Access |
+|--------|-----------------------------------------|--------------------------------------|--------|
+| POST   | `/api/orders`                           | Create an order from the cart        | USER   |
+| GET    | `/api/orders`                           | Get order history (paginated)        | USER   |
+| GET    | `/api/orders/{orderId}/items`           | Get all items of an order            | USER   |
+| GET    | `/api/orders/{orderId}/items/{itemId}`  | Get a specific item of an order      | USER   |
+| PATCH  | `/api/orders/{id}`                      | Update order status                  | ADMIN  |
+
+An order is built from the user's current shopping cart: every cart item becomes an
+order item. Users see only their own orders, while the admin manages order statuses.
+
 ## Running with Docker
 
 ### Prerequisites
@@ -54,7 +118,7 @@ Swagger UI: `http://localhost:<SPRING_LOCAL_PORT>/api/swagger-ui/index.html`
 - Email: `admin@bookstore.com`
 - Password: `admin12345`
 
-To get a regular user, register via `POST /api/auth/register`.
+To get a regular user, register via `POST /api/auth/registration`.
 New users receive the `USER` role.
 
 > These credentials are for local testing only.
