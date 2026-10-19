@@ -1,6 +1,22 @@
 # book-store
 Online book store REST API built with Spring Boot
 
+## Tech Stack
+
+| Category      | Technologies                           |
+|---------------|----------------------------------------|
+| Language      | Java 17                                |
+| Framework     | Spring Boot 3.5, Spring Web            |
+| Security      | Spring Security, JWT (jjwt)            |
+| Persistence   | Spring Data JPA, Hibernate, MySQL 8.4  |
+| Migrations    | Liquibase                              |
+| Mapping       | MapStruct, Lombok                      |
+| Validation    | Jakarta Bean Validation                |
+| API docs      | Swagger UI (springdoc-openapi)         |
+| Testing       | JUnit 5, Mockito, Spring Boot Test, H2 |
+| Build & tools | Maven, Checkstyle                      |
+| DevOps        | Docker, Docker Compose                 |
+
 ## API Endpoints
 
 ### 🔐 Authentication
@@ -51,6 +67,7 @@ category ids, since the category is already known from the request.
 
 The cart always belongs to the logged-in user: the user is taken from the JWT token,
 so no user id is passed in the URL and nobody can access someone else's cart.
+
 > The admin account has no cart. To test the cart and orders, register a regular user.
 
 ### 📦 Orders
@@ -136,5 +153,4 @@ mvn clean verify
 ```
 
 Tests use an in-memory H2 database, so Docker is not required.
-This command also runs Checkstyle and generates a JaCoCo coverage report
-in `target/site/jacoco/index.html`.
+This command also runs Checkstyle.
