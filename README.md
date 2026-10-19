@@ -13,16 +13,16 @@ Copy the template and fill in your own values:
 cp .env.template .env
 ```
 
-| Variable | Description | Example |
-|---|---|---|
-| `MYSQLDB_USER` | Database user. Must be `root`, because the password below is set for the root user | `root` |
-| `MYSQLDB_ROOT_PASSWORD` | Password for the MySQL root user | your own password |
-| `MYSQLDB_DATABASE` | Database name | `book_store` |
-| `MYSQLDB_LOCAL_PORT` | MySQL port on your machine. Use a free port (not `3306` if you already have MySQL installed locally) | `3307` |
-| `MYSQLDB_DOCKER_PORT` | MySQL port inside the container | `3306` |
-| `SPRING_LOCAL_PORT` | Application port on your machine | `8088` |
-| `SPRING_DOCKER_PORT` | Application port inside the container | `8080` |
-| `JWT_SIGNING_KEY` | Secret key for signing JWT tokens, at least 32 characters | see below |
+| Variable                | Description                                                                                          | Example           |
+|-------------------------|------------------------------------------------------------------------------------------------------|-------------------|
+| `MYSQLDB_USER`          | Database user. Must be `root`, because the password below is set for the root user                   | `root`            |
+| `MYSQLDB_ROOT_PASSWORD` | Password for the MySQL root user                                                                     | your own password |
+| `MYSQLDB_DATABASE`      | Database name                                                                                        | `book_store`      |
+| `MYSQLDB_LOCAL_PORT`    | MySQL port on your machine. Use a free port (not `3306` if you already have MySQL installed locally) | `3307`            |
+| `MYSQLDB_DOCKER_PORT`   | MySQL port inside the container                                                                      | `3306`            |
+| `SPRING_LOCAL_PORT`     | Application port on your machine                                                                     | `8088`            |
+| `SPRING_DOCKER_PORT`    | Application port inside the container                                                                | `8080`            |
+| `JWT_SIGNING_KEY`       | Secret key for signing JWT tokens, at least 32 characters                                            | see below         |
 
 Generate a secure JWT key:
 
@@ -48,9 +48,29 @@ The first start takes a few minutes: Docker downloads the images and MySQL initi
 
 ### 3. Open the API
 Swagger UI: `http://localhost:<SPRING_LOCAL_PORT>/api/swagger-ui/index.html`
+(e.g. `http://localhost:8088/api/swagger-ui/index.html`)
+
+**Default admin account** (created automatically by Liquibase on first start):
+- Email: `admin@bookstore.com`
+- Password: `admin12345`
+
+To get a regular user, register via `POST /api/auth/register`.
+New users receive the `USER` role.
+
+> These credentials are for local testing only.
 
 ### 4. Stop the application
 
 ```bash
 docker compose down
 ```
+
+## Running tests
+
+```bash
+mvn clean verify
+```
+
+Tests use an in-memory H2 database, so Docker is not required.
+This command also runs Checkstyle and generates a JaCoCo coverage report
+in `target/site/jacoco/index.html`.
